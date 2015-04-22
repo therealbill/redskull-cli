@@ -18,7 +18,8 @@ var timeout = time.Second * 2
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "redskull-client"
+	app.Name = "redskull-cli"
+	app.Version = "0.5.0"
 	app.EnableBashCompletion = true
 	author := cli.Author{Name: "Bill Anderson", Email: "therealbill@me.com"}
 	app.Authors = append(app.Authors, author)
@@ -167,16 +168,13 @@ func ShowPod(c *cli.Context) {
 	pod.Master.UpdateData()
 	pod.CanFailover()
 	data := PodData{Pod: pod, CanFailover: pod.CanFailover(), HasErrors: pod.HasErrors()}
-
 	if err != nil {
 		log.Fatal(err)
 	}
-	//log.Printf("PodData: %+v", data)
 	err = t.Execute(os.Stdout, data)
 	if err != nil {
 		panic(err)
 	}
-
 }
 
 func AddPod(c *cli.Context) {

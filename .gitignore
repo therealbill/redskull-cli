@@ -22,7 +22,7 @@ _testmain.go
 *.exe
 *.test
 *.prof
-redskull-client
+redskull-cli
 
 # Vim
 *.swp
