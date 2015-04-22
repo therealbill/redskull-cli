@@ -8,4 +8,4 @@ before_install:
 
 after_success:
   - go build 
-  - ghr  --token $GITHUB_TOKEN $(cat .version) redskull-cli
+  - ghr  --username therealbill --token $GITHUB_TOKEN $(cat .version) redskull-cli
