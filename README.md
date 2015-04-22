@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/therealbill/redskull-cli.svg?branch=master)](https://travis-ci.org/therealbill/redskull-cli)
+
+
 # redskull-cli
 This is a CLI Tool for interacting with Redskull via it's TCP-RPC channel. This
 port is 1 higher than the bind port, so the default is 8001.
