@@ -12,18 +12,29 @@ import (
 	rpcclient "github.com/therealbill/redskull/rpcclient"
 )
 
-var client *rpcclient.Client
+var (
+	client  *rpcclient.Client
+	app     *cli.App
+	timeout = time.Second * 2
+)
 
-var timeout = time.Second * 2
+//var rpc_addr string
 
 func main() {
-	app := cli.NewApp()
+	app = cli.NewApp()
 	app.Name = "redskull-cli"
 	app.Version = "0.5.0"
 	app.EnableBashCompletion = true
 	author := cli.Author{Name: "Bill Anderson", Email: "therealbill@me.com"}
 	app.Authors = append(app.Authors, author)
-
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:   "rpcaddr, r",
+			Value:  "localhost:8001",
+			Usage:  "Redskull RCP address in form 'ip:port'",
+			EnvVar: "REDSKULL_RPCADDR",
+		},
+	}
 	app.Commands = []cli.Command{
 		{
 			Name:  "pod",
@@ -117,27 +128,10 @@ func main() {
 		},
 	}
 	app.Run(os.Args)
-
-	/*
-
-		pod, err = client.GetPod("pod1")
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Printf("pod: %+v", pod)
-
-		log.Print("Initiating Re-balance\n")
-		err = client.BalancePod("pod1")
-		if err != nil {
-			log.Printf("Unable to request rebalance of pod1")
-		} else {
-			log.Print("Rebalance initiated")
-		}
-	*/
 }
 
 func RemovePod(c *cli.Context) {
-	client, err := rpcclient.NewClient("127.0.0.1:8001", timeout)
+	client, err := rpcclient.NewClient(c.GlobalString("rpcaddr"), timeout)
 	name := c.String("name")
 	log.Printf("Removing pod %s", name)
 	err = client.RemovePod(name)
@@ -158,12 +152,16 @@ type PodData struct {
 var templateFuncs = template.FuncMap{"rangeStruct": RangeStructer}
 
 func ShowPod(c *cli.Context) {
-	client, err := rpcclient.NewClient("127.0.0.1:8001", timeout)
+	client, err := rpcclient.NewClient(c.GlobalString("rpcaddr"), timeout)
 	t := template.Must(template.New("podinfo").Parse(PodInfoTemplate)).Funcs(templateFuncs)
 	if err != nil {
 		log.Fatal(err)
 	}
 	pod, err := client.GetPod(c.String("name"))
+	if err != nil {
+		log.Printf("Pod pull failed with error '%s'", err.Error())
+		return
+	}
 	pod.Master.LastUpdateValid = false
 	pod.Master.UpdateData()
 	pod.CanFailover()
@@ -178,7 +176,7 @@ func ShowPod(c *cli.Context) {
 }
 
 func AddPod(c *cli.Context) {
-	client, err := rpcclient.NewClient("127.0.0.1:8001", timeout)
+	client, err := rpcclient.NewClient(c.GlobalString("rpcaddr"), timeout)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -190,7 +188,7 @@ func AddPod(c *cli.Context) {
 }
 
 func AddSentinel(c *cli.Context) {
-	client, err := rpcclient.NewClient("127.0.0.1:8001", timeout)
+	client, err := rpcclient.NewClient(c.GlobalString("rpcaddr"), timeout)
 	if err != nil {
 		log.Fatal(err)
 	}

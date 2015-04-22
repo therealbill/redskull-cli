@@ -14,7 +14,7 @@ Here is the output of `redskull-cli -h`:
 
 ```
 NAME:
-   redskull-cl - A new cli application
+   redskull-cli - A new cli application
 
 USAGE:
    redskull-cli [global options] command [command options] [arguments...]
@@ -31,10 +31,20 @@ COMMANDS:
    help, h      Shows a list of commands or help for one command
    
 GLOBAL OPTIONS:
+   --rpcaddr, -r "localhost:8001"       Redskull RCP address in form 'ip:port' [$REDSKULL_RPCADDR]
    --help, -h                   show help
    --generate-bash-completion
    --version, -v                print the version
 ```   
+
+## Selecting your RedSkull RPC Address
+
+If running this on a redskull node running all defaults, no work needs to be done.
+
+If however you are running this elsewhere or have changed the RPC port Redskull
+listens on, you can either set the environment variable "REDSKULL_RPCADDR" to
+the `IP:PORT` address of the RCP endpoint (which can be a TCP load balancer,
+DNS RR, etc. ) or pass the option as listed in the `help` output.
 
 ## Example
 
@@ -87,7 +97,5 @@ to add a pod with it. For example, to add a sentinel in the default port on IP
 1.2.3.5: `redis-cli sentinel add -n 1.2.3.5`
 
 # TODO/BUGS
- * Currently expects to be talking to localhost:8001. This is moving into a
-configurable via ENV and/or CLI flags.
  * Still need several functions via the Server API exposed such as cloning, and more detailed RS determined data
  * More/Better output in `pod show`
