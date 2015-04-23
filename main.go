@@ -23,7 +23,7 @@ var (
 func main() {
 	app = cli.NewApp()
 	app.Name = "redskull-cli"
-	app.Version = "0.5.0"
+	app.Version = "0.5.1"
 	app.EnableBashCompletion = true
 	author := cli.Author{Name: "Bill Anderson", Email: "therealbill@me.com"}
 	app.Authors = append(app.Authors, author)
