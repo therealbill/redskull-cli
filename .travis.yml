@@ -1,15 +1,11 @@
 language: go
-
 go:
-    - 1.4
-
+- 1.4
 before_install:
-  - go get github.com/tcnksm/ghr
-
+- go get github.com/tcnksm/ghr
 after_success:
-  - go build 
-  - ghr  --username therealbill --token $GITHUB_TOKEN $(cat .version) redskull-cli
-
-
+- go build
+- ghr  --username therealbill --token $GITHUB_TOKEN $(cat .version) redskull-cli
 notifications:
-  slack: thebaldguy:3rIHmm9XsPc3c0wokSiyotKl
+  slack:
+    secure: FyLN+aaRAhomZH6j1DefKiCjvWR4yOnWncn5dHeKC24wptEPQlD3sw1mX+cy/bGlRx1oyZHmDzcxR+M9RAPTEg2kj2/wDd32qkngEIbyrwrFElt9snW7NrIec+BhxTcRpokPGsYE6WIWpoeYCpTlBQtIBUbM54kN0NSlR+l1ass=
