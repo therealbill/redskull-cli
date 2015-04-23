@@ -146,6 +146,7 @@ func RemovePod(c *cli.Context) {
 type PodData struct {
 	Pod         actions.RedisPod
 	CanFailover bool
+	Sentinels   []string
 	HasErrors   bool
 }
 
@@ -165,7 +166,14 @@ func ShowPod(c *cli.Context) {
 	pod.Master.LastUpdateValid = false
 	pod.Master.UpdateData()
 	pod.CanFailover()
-	data := PodData{Pod: pod, CanFailover: pod.CanFailover(), HasErrors: pod.HasErrors()}
+	scount, sentinels, err := client.GetSentinelsForPod(c.String("name"))
+	if err != nil {
+		log.Printf("Error on GSFP call: %s", err.Error())
+	} else {
+		pod.SentinelCount = scount
+		log.Printf("Found %d Sentinels: %v", scount, sentinels)
+	}
+	data := PodData{Pod: pod, CanFailover: pod.CanFailover(), HasErrors: pod.HasErrors(), Sentinels: sentinels}
 	if err != nil {
 		log.Fatal(err)
 	}

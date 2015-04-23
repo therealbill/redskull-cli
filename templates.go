@@ -11,7 +11,10 @@ DownAfter: {{.Pod.Info.DownAfterMilliseconds}}ms
 Current Master: {{.Pod.Master.Name}}
 Can AUTH master: {{ .Pod.Master.HasValidAuth}}
 SentinelCount: {{.Pod.SentinelCount}}
-Has Errors: {{.HasErrors}}
+
+# Sentinels
+{{ range .Sentinels }}{{.}}
+{{end}}
 
 # Replication
 Role: {{.Pod.Info.RoleReported}}
