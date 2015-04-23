@@ -9,3 +9,7 @@ before_install:
 after_success:
   - go build 
   - ghr  --username therealbill --token $GITHUB_TOKEN $(cat .version) redskull-cli
+
+
+notifications:
+  slack: thebaldguy:3rIHmm9XsPc3c0wokSiyotKl
