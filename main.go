@@ -53,6 +53,18 @@ func main() {
 					},
 				},
 				{
+					Name:   "authcheck",
+					Usage:  "check auth status of pod",
+					Action: CheckPodAuth,
+					Flags: []cli.Flag{
+						cli.StringFlag{
+							Name:  "name, n",
+							Value: "",
+							Usage: "name of the pod",
+						},
+					},
+				},
+				{
 					Name:   "remove",
 					Usage:  "Remove pod from sentinels",
 					Action: RemovePod,
@@ -93,6 +105,33 @@ func main() {
 							Name:  "port, p",
 							Value: 6379,
 							Usage: "port of the pod",
+						},
+					},
+				},
+				{
+					Name:   "addslave",
+					Usage:  "Add slave to a pod",
+					Action: AddSlaveToPod,
+					Flags: []cli.Flag{
+						cli.StringFlag{
+							Name:  "name, n",
+							Value: "",
+							Usage: "name of the pod",
+						},
+						cli.StringFlag{
+							Name:  "slaveauth, s",
+							Value: "",
+							Usage: "auth token for the slave",
+						},
+						cli.StringFlag{
+							Name:  "ip, i",
+							Value: "",
+							Usage: "ip of the slave",
+						},
+						cli.IntFlag{
+							Name:  "port, p",
+							Value: 6379,
+							Usage: "port of the slave",
 						},
 					},
 				},
@@ -210,4 +249,41 @@ func AddSentinel(c *cli.Context) {
 		return
 	}
 	log.Printf("Added sentinel %s:%d", c.String("ip"), c.Int("port"))
+}
+
+func AddSlaveToPod(c *cli.Context) {
+	client, err := rpcclient.NewClient(c.GlobalString("rpcaddr"), timeout)
+	if err != nil {
+		log.Fatal(err)
+	}
+	added, err := client.AddSlaveToPod(c.String("name"), c.String("ip"), c.Int("port"), c.String("slaveauth"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	if !added {
+		log.Print("No error, but not reported as added. Check the server logs for why.")
+		return
+	}
+	log.Printf("Enslaved %s:%d to %s", c.String("ip"), c.Int("port"), c.String("name"))
+}
+
+func CheckPodAuth(c *cli.Context) {
+	client, err := rpcclient.NewClient(c.GlobalString("rpcaddr"), timeout)
+	authmap, err := client.CheckPodAuth(c.String("name"))
+	if err != nil {
+		log.Print("Unable to get pod auth. Err: ", err)
+		return
+	}
+	allgood := true
+	for s, r := range authmap {
+		if !r {
+			log.Print("%s can not be athenticated to using the pod's auth token", s)
+			allgood = false
+		}
+	}
+	if !allgood {
+		log.Print("Pod is not considered to have a valid authentication config because at least one node has a different authentication setting")
+		return
+	}
+	log.Print("Auth Valid")
 }
