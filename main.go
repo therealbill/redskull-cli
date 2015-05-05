@@ -41,6 +41,11 @@ func main() {
 			Usage: "Pod specific actions",
 			Subcommands: []cli.Command{
 				{
+					Name:   "list",
+					Usage:  "list pods",
+					Action: ShowPods,
+				},
+				{
 					Name:   "show",
 					Usage:  "show pod info",
 					Action: ShowPod,
@@ -193,6 +198,9 @@ var templateFuncs = template.FuncMap{"rangeStruct": RangeStructer}
 
 func ShowPod(c *cli.Context) {
 	client, err := rpcclient.NewClient(c.GlobalString("rpcaddr"), timeout)
+	if err != nil {
+		log.Fatal(err)
+	}
 	t := template.Must(template.New("podinfo").Parse(PodInfoTemplate)).Funcs(templateFuncs)
 	if err != nil {
 		log.Fatal(err)
@@ -277,7 +285,7 @@ func CheckPodAuth(c *cli.Context) {
 	allgood := true
 	for s, r := range authmap {
 		if !r {
-			log.Print("%s can not be athenticated to using the pod's auth token", s)
+			log.Print("%s can not be authenticated to using the pod's auth token", s)
 			allgood = false
 		}
 	}
@@ -286,4 +294,23 @@ func CheckPodAuth(c *cli.Context) {
 		return
 	}
 	log.Print("Auth Valid")
+}
+
+func GetPodList(c *cli.Context) ([]string, error) {
+	client, err := rpcclient.NewClient(c.GlobalString("rpcaddr"), timeout)
+	if err != nil {
+		log.Fatal(err)
+	}
+	pods, err := client.GetPodList()
+	if err != nil {
+		log.Print("Failure pulling pod list")
+	}
+	return pods, err
+}
+
+func ShowPods(c *cli.Context) {
+	pods, _ := GetPodList(c)
+	for _, pod := range pods {
+		log.Printf("Pod '%s'", pod)
+	}
 }
