@@ -96,6 +96,10 @@ Useful for puppet recipes, you can add a sentinel via the CLI without needing
 to add a pod with it. For example, to add a sentinel in the default port on IP
 1.2.3.5: `redis-cli sentinel add -n 1.2.3.5`
 
+# Bash Completion
+
+To enable bash completion, copy redskull-cli-complete.sh into your completions directory and source it.
+
 # TODO/BUGS
  * Still need several functions via the Server API exposed such as cloning, and more detailed RS determined data
  * More/Better output in `pod show`
